@@ -1,3 +1,14 @@
+const result = document.createElement("div");
+const scoreDiv = document.createElement("div");
+const winnerDiv = document.createElement("div");
+
+const buttons = document.querySelectorAll("button");
+const mainDiv = document.getElementById("buttonContainer");
+
+let computerScore = 0;
+let humanScore = 0;
+let rounds = 0;
+
 const getComputerChoice = () => {
   const rnd = Math.floor(Math.random() * 3);
   let choice = "";
@@ -28,48 +39,65 @@ const getHumanChoice = () => {
   }
 };
 
-const playGame = (numOfRounds) => {
-  let computerScore = 0;
-  let humanScore = 0;
-  let humanSelection;
-  let computerSelection;
+const resetGame = () => {
+  humanScore = 0;
+  computerScore = 0;
+  rounds = 0;
+  mainDiv.removeChild(result);
+  mainDiv.removeChild(scoreDiv);
+  mainDiv.removeChild(winnerDiv);
+};
 
-  const playRound = (humanChoice, computerChoice) => {
-    console.log(humanChoice, computerChoice);
-    if (
-      (humanChoice === "Rock" && computerChoice === "Paper") ||
-      (humanChoice === "Paper" && computerChoice === "Scissors") ||
-      (humanChoice === "Scissors" && computerChoice === "Rock")
-    ) {
-      computerScore++;
-      console.log(`You loose, ${computerChoice} beats ${humanChoice}`);
-    } else if (
-      (humanChoice === "Rock" && computerChoice === "Scissors") ||
-      (humanChoice === "Paper" && computerChoice === "Rock") ||
-      (humanChoice === "Scissors" && computerChoice === "Paper")
-    ) {
-      humanScore++;
-      console.log(`You win, ${humanChoice} beats ${computerChoice}`);
-    } else {
-      console.log("This one's a tie");
-    }
-  };
+const playRound = (humanChoice, computerChoice) => {
+  console.log(humanChoice, computerChoice);
+  if (
+    (humanChoice === "Rock" && computerChoice === "Paper") ||
+    (humanChoice === "Paper" && computerChoice === "Scissors") ||
+    (humanChoice === "Scissors" && computerChoice === "Rock")
+  ) {
+    computerScore++;
+    rounds++;
+    result.textContent = `You loose, ${computerChoice} beats ${humanChoice}`;
+    scoreDiv.textContent = `You: ${humanScore} || Computer: ${computerScore}`;
+    mainDiv.appendChild(result);
+    mainDiv.appendChild(scoreDiv);
+  } else if (
+    (humanChoice === "Rock" && computerChoice === "Scissors") ||
+    (humanChoice === "Paper" && computerChoice === "Rock") ||
+    (humanChoice === "Scissors" && computerChoice === "Paper")
+  ) {
+    humanScore++;
+    rounds++;
+    result.textContent = `You win, ${humanChoice} beats ${computerChoice}`;
+    scoreDiv.textContent = `You: ${humanScore} || Computer: ${computerScore}`;
+    mainDiv.appendChild(result);
+    mainDiv.appendChild(scoreDiv);
+  } else {
+    result.textContent = "This one's a tie";
+    scoreDiv.textContent = `You: ${humanScore} || Computer: ${computerScore}`;
+    mainDiv.appendChild(result);
+    mainDiv.appendChild(scoreDiv);
+  }
 
-  for (let i = 1; i <= numOfRounds; i++) {
-    humanSelection = getHumanChoice();
-    computerSelection = getComputerChoice();
-    console.log(computerScore, humanScore);
-    playRound(humanSelection, computerSelection);
-    console.log(computerScore, humanScore);
+  if (computerScore >= 5) {
+    winnerDiv.textContent = "GOOD GAME, Computer won!";
+    mainDiv.appendChild(winnerDiv);
+    setTimeout(() => {
+      resetGame();
+    }, 2000);
+  } else if (humanScore >= 5) {
+    winnerDiv.textContent = "GOOD GAME, you won!";
+    mainDiv.appendChild(winnerDiv);
+    setTimeout(() => {
+      resetGame();
+    }, 2000);
   }
 };
 
-const checkForRounds = () => {
-  const numOfRounds = parseInt(
-    prompt("How many rounds would you like to play? (Enter a digit)")
-  );
-  alert(`Playing ${numOfRounds} rounds of Rock, Paper, Scissors. Let's Go!`);
-  playGame(numOfRounds);
-};
-
-checkForRounds();
+buttons.forEach((button) => {
+  button.addEventListener("click", (e) => {
+    let compChoice = getComputerChoice();
+    let humChoice = e.target.value;
+    playRound(compChoice, humChoice);
+  });
+});
